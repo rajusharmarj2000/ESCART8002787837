@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Service Directory</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#f0f4ff;min-height:100vh;overflow-x:hidden}
+:root{--blue:#2563eb;--green:#16a34a;--radius:16px}
+
+/* HEADER */
+.header{background:linear-gradient(135deg,#1e40af,#3b82f6,#60a5fa);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(37,99,235,.4)}
+.header-logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:36px;height:36px;background:rgba(255,255,255,.25);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px}
+.header h1{color:#fff;font-size:17px;font-weight:700}
+.header-right{display:flex;align-items:center;gap:8px}
+.btn-login-hdr{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);border-radius:9px;padding:7px 13px;color:#fff;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:.2s}
+.btn-login-hdr:hover{background:rgba(255,255,255,.3)}
+.admin-hdr-info{display:none;align-items:center;gap:8px}
+.admin-badge{background:rgba(255,215,0,.25);color:#ffd700;border:1px solid rgba(255,215,0,.4);border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:.3px}
+.btn-logout-hdr{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 11px;color:#fff;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;transition:.2s}
+.btn-logout-hdr:hover{background:rgba(255,80,80,.35)}
+.hamburger{background:rgba(255,255,255,.2);border:none;border-radius:10px;width:36px;height:36px;color:#fff;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s}
+.hamburger:hover{background:rgba(255,255,255,.35)}
+
+/* LOGIN MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:600;backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px}
+.modal-bg.open{display:flex}
+.modal-box{background:#fff;border-radius:24px;padding:32px 24px 24px;width:100%;max-width:360px;box-shadow:0 24px 60px rgba(0,0,0,.35);animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-logo{text-align:center;margin-bottom:22px}
+.modal-ico{width:68px;height:68px;background:linear-gradient(135deg,#1e40af,#7c3aed);border-radius:20px;display:inline-flex;align-items:center;justify-content:center;font-size:28px;color:#fff;margin-bottom:10px;box-shadow:0 8px 20px rgba(37,99,235,.35)}
+.modal-logo h2{font-size:20px;font-weight:800;color:#1e293b}
+.modal-logo p{font-size:13px;color:#6b7280;margin-top:3px}
+.login-err{background:#fff1f2;color:#e11d48;border-radius:8px;padding:9px 12px;font-size:13px;margin-bottom:12px;display:none;align-items:center;gap:7px}
+.login-err.show{display:flex}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:5px;text-transform:uppercase;letter-spacing:.3px}
+.form-control{width:100%;padding:11px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;color:#1e293b;background:#f8fafc;font-family:'Inter',sans-serif;transition:.2s}
+.form-control:focus{outline:none;border-color:#3b82f6;background:#fff;box-shadow:0 0 0 3px rgba(59,130,246,.12)}
+.inp-wrap{position:relative}
+.inp-wrap i{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:14px}
+.inp-wrap .form-control{padding-left:38px}
+.toggle-pass{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:#94a3b8;cursor:pointer;font-size:14px}
+.btn-login-submit{width:100%;padding:13px;background:linear-gradient(135deg,#1e40af,#2563eb);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:.2s;margin-top:4px}
+.btn-login-submit:hover{opacity:.92;transform:translateY(-1px)}
+.modal-hint{text-align:center;margin-top:14px;font-size:12px;color:#94a3b8}
+.modal-hint b{color:#374151}
+
+/* SIDEBAR */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;backdrop-filter:blur(3px)}
+.overlay.open{display:block}
+.sidebar{position:fixed;top:0;right:-285px;width:285px;height:100%;background:#fff;z-index:300;transition:.3s ease;box-shadow:-4px 0 30px rgba(0,0,0,.2);overflow-y:auto}
+.sidebar.open{right:0}
+.sidebar-header{background:linear-gradient(135deg,#1e40af,#3b82f6);padding:20px 16px 16px;color:#fff}
+.sidebar-header h2{font-size:20px;font-weight:700}
+.sidebar-header p{font-size:12px;opacity:.8;margin-top:2px}
+.sidebar-close{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.2);border:none;border-radius:8px;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer}
+.sidebar nav{padding:10px 0}
+.nav-item{display:flex;align-items:center;gap:12px;padding:13px 20px;color:#374151;font-size:14px;font-weight:500;cursor:pointer;transition:.2s;border-left:3px solid transparent}
+.nav-item:hover,.nav-item.active{background:#eff6ff;color:#2563eb;border-left-color:#2563eb}
+.nav-item i{width:20px;text-align:center;color:#6b7280;font-size:15px}
+.nav-item:hover i,.nav-item.active i{color:#2563eb}
+.nav-divider{height:1px;background:#f3f4f6;margin:6px 0}
+.nav-section-label{padding:10px 20px 4px;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px}
+.admin-only{display:none}
+.sidebar-admin-panel{display:none;margin:12px 16px;background:linear-gradient(135deg,#eff6ff,#f0fdf4);border-radius:12px;padding:12px;border:1px solid #dbeafe}
+.sidebar-admin-panel p{font-size:11px;color:#2563eb;font-weight:600;margin-bottom:6px}
+.sidebar-admin-panel span{font-size:12px;color:#374151}
+.nav-logout{color:#e11d48!important;display:none}
+.nav-logout i{color:#e11d48!important}
+.nav-logout:hover,.nav-logout.active{background:#fff1f2!important;border-left-color:#e11d48!important}
+
+/* FILTERS */
+.filters{background:#fff;padding:14px 16px;display:flex;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.filter-select{flex:1;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;color:#374151;background:#f8fafc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center;-webkit-appearance:none;appearance:none;cursor:pointer;font-family:'Inter',sans-serif}
+.filter-select:focus{outline:none;border-color:#3b82f6}
+
+/* HERO */
+.hero{margin:16px;border-radius:20px;background:linear-gradient(135deg,#1e3a8a,#2563eb 50%,#7c3aed);padding:26px 20px;color:#fff;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-40px;right:-40px;width:150px;height:150px;background:rgba(255,255,255,.08);border-radius:50%}
+.hero::after{content:'';position:absolute;bottom:-30px;left:-20px;width:110px;height:110px;background:rgba(255,255,255,.05);border-radius:50%}
+.hero-badge{display:inline-block;background:rgba(255,255,255,.2);padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;margin-bottom:8px;backdrop-filter:blur(4px)}
+.hero h2{font-size:22px;font-weight:800;line-height:1.2;margin-bottom:6px}
+.hero p{font-size:13px;opacity:.85;margin-bottom:16px}
+.hero-btns{display:flex;gap:10px;flex-wrap:wrap;position:relative;z-index:1}
+.btn-call{display:flex;align-items:center;gap:7px;background:#fff;color:#2563eb;border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,.2);transition:.2s}
+.btn-call:hover{transform:translateY(-2px)}
+.btn-wa{display:flex;align-items:center;gap:7px;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,.2);transition:.2s}
+.btn-wa:hover{transform:translateY(-2px)}
+
+/* CARDS */
+.section{padding:0 16px 16px}
+.section-header{display:flex;align-items:center;justify-content:space-between;padding:14px 0 10px}
+.section-title{font-size:16px;font-weight:700;color:#1e293b}
+.section-count{background:#eff6ff;color:#2563eb;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08);transition:.25s}
+.card:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(0,0,0,.13)}
+.card-img-wrap{position:relative;height:155px;overflow:hidden}
+.card-img-wrap img{width:100%;height:100%;object-fit:cover;transition:.3s}
+.card:hover .card-img-wrap img{transform:scale(1.05)}
+.card-badge{position:absolute;top:8px;left:8px;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;padding:3px 8px;border-radius:7px;font-size:10px;font-weight:600}
+.card-body{padding:10px}
+.card-name{font-size:13px;font-weight:700;color:#1e293b}
+.card-age{color:#6b7280;font-size:12px}
+.card-city{display:flex;align-items:center;gap:4px;color:#64748b;font-size:11px;margin-top:3px}
+.card-city i{color:#2563eb;font-size:10px}
+.card-actions{display:flex;gap:5px;margin-top:8px}
+.card-btn-call{flex:1;display:flex;align-items:center;justify-content:center;gap:4px;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;border:none;border-radius:8px;padding:7px 4px;font-size:11px;font-weight:600;cursor:pointer;transition:.2s}
+.card-btn-call:hover{background:#dbeafe}
+.card-btn-wa{flex:1;display:flex;align-items:center;justify-content:center;gap:4px;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;border:none;border-radius:8px;padding:7px 4px;font-size:11px;font-weight:600;cursor:pointer;transition:.2s}
+.card-btn-wa:hover{background:#dcfce7}
+.card-like-btn{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.9);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:16px;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.15);border:none;transition:.2s;z-index:2}
+.card-like-btn.liked{color:#e11d48}
+.card-like-btn.liked i{animation:pop .3s ease-out}
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
+
+/* PAGES */
+.page{display:none}.page.active{display:block}
+
+/* ADMIN */
+.admin-wrap{padding:16px}
+.admin-title{font-size:19px;font-weight:700;color:#1e293b;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.admin-title i{color:#2563eb}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.stat-card{background:#fff;border-radius:14px;padding:14px 8px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.stat-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:17px;margin:0 auto 7px}
+.stat-val{font-size:22px;font-weight:800;color:#1e293b}
+.stat-lbl{font-size:10px;color:#6b7280;font-weight:500;margin-top:2px}
+.stat-card:nth-child(1) .stat-icon{background:#eff6ff;color:#2563eb}
+.stat-card:nth-child(2) .stat-icon{background:#f0fdf4;color:#16a34a}
+.stat-card:nth-child(3) .stat-icon{background:#fdf4ff;color:#9333ea}
+.menu-title{font-size:13px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.menu-item{background:#fff;border-radius:14px;padding:18px 12px;display:flex;flex-direction:column;align-items:center;gap:9px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.07);transition:.25s;border:2px solid transparent}
+.menu-item:hover{border-color:#3b82f6;transform:translateY(-2px)}
+.menu-icon{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.menu-item:nth-child(1) .menu-icon{background:#eff6ff;color:#2563eb}
+.menu-item:nth-child(2) .menu-icon{background:#f0fdf4;color:#16a34a}
+.menu-item:nth-child(3) .menu-icon{background:#fff7ed;color:#ea580c}
+.menu-item:nth-child(4) .menu-icon{background:#fdf4ff;color:#9333ea}
+.menu-item:nth-child(5) .menu-icon{background:#fff1f2;color:#e11d48}
+.menu-item:nth-child(6) .menu-icon{background:#f0f9ff;color:#0284c7}
+.menu-lbl{font-size:13px;font-weight:600;color:#374151;text-align:center}
+
+/* FORMS */
+.form-wrap{padding:16px}
+.form-title{font-size:17px;font-weight:700;color:#1e293b;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.form-title i{color:#2563eb}
+.form-card{background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+.form-group-s{margin-bottom:13px}
+.form-group-s label{display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:5px}
+.upload-area{border:2px dashed #93c5fd;border-radius:12px;padding:24px 20px;text-align:center;cursor:pointer;background:#f0f7ff;transition:.2s}
+.upload-area:hover{border-color:#2563eb;background:#dbeafe}
+.upload-area i{font-size:30px;color:#93c5fd;margin-bottom:7px}
+.upload-area p{font-size:13px;color:#6b7280}
+.upload-area input{display:none}
+#preview{width:100%;max-height:190px;object-fit:cover;border-radius:10px;margin-top:10px;display:none}
+.btn-save{width:100%;padding:13px;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:.2s;margin-top:6px}
+.btn-save:hover{opacity:.92;transform:translateY(-1px)}
+
+/* MANAGE */
+.manage-wrap{padding:16px}
+.manage-title{font-size:17px;font-weight:700;color:#1e293b;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.manage-title i{color:#2563eb}
+.search-bar{display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;padding:9px 12px;margin-bottom:12px}
+.search-bar i{color:#94a3b8}
+.search-bar input{border:none;outline:none;flex:1;font-size:14px;color:#374151;font-family:'Inter',sans-serif}
+.manage-card{background:#fff;border-radius:14px;padding:13px;display:flex;align-items:center;gap:11px;box-shadow:0 2px 10px rgba(0,0,0,.07);margin-bottom:9px}
+.manage-img{width:54px;height:54px;border-radius:12px;object-fit:cover}
+.manage-info{flex:1}
+.manage-name{font-size:14px;font-weight:700;color:#1e293b}
+.manage-meta{font-size:11px;color:#64748b;margin-top:2px}
+.manage-actions{display:flex;gap:6px}
+.btn-edit{background:#eff6ff;color:#2563eb;border:none;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center}
+.btn-del{background:#fff1f2;color:#e11d48;border:none;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center}
+.btn-edit:hover{background:#dbeafe}.btn-del:hover{background:#ffe4e6}
+.list-item{background:#fff;border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.07);margin-bottom:8px;transition:.2s}
+.list-item:hover{box-shadow:0 4px 14px rgba(0,0,0,.11);transform:translateY(-1px)}
+.list-item-label{font-size:14px;font-weight:600;color:#1e293b;display:flex;align-items:center;gap:8px}
+.list-item-label i{color:#2563eb;font-size:13px}
+.empty-msg{text-align:center;padding:22px 10px;color:#94a3b8;font-size:13px}
+.add-row{display:flex;gap:8px;margin-bottom:4px}
+.add-row input{flex:1;padding:10px 13px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;color:#1e293b;background:#f8fafc;font-family:'Inter',sans-serif;transition:.2s}
+.add-row input:focus{outline:none;border-color:#3b82f6;background:#fff}
+.btn-add-item{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;transition:.2s}
+.btn-add-item:hover{opacity:.9}
+.section-sub{font-size:13px;font-weight:700;color:#374151;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.section-sub i{color:#2563eb}
+.service-box{border-radius:18px;padding:22px 18px;margin-bottom:12px;color:#fff;position:relative;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,.18);transition:.25s}
+.service-box:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(0,0,0,.22)}
+.service-box::before{content:'';position:absolute;top:-30px;right:-30px;width:110px;height:110px;background:rgba(255,255,255,.1);border-radius:50%}
+.service-box::after{content:'';position:absolute;bottom:-20px;left:-15px;width:80px;height:80px;background:rgba(255,255,255,.07);border-radius:50%}
+.sbox-icon{font-size:26px;margin-bottom:10px;position:relative}
+.sbox-title{font-size:17px;font-weight:800;margin-bottom:6px;position:relative;line-height:1.3}
+.sbox-desc{font-size:13px;opacity:.88;line-height:1.65;position:relative}
+.sboxes-header{font-size:16px;font-weight:700;color:#1e293b;padding:14px 0 10px;display:flex;align-items:center;gap:7px}
+.sboxes-header i{color:#2563eb}
+.load-more-btn{width:100%;padding:13px;background:#fff;color:#374151;border:2px dashed #94a3b8;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:.2s;margin:8px 0 4px}
+.load-more-btn:hover{border-color:#3b82f6;color:#2563eb;background:#eff6ff}
+
+/* TOP SLIDER */
+.top-slider-wrap{margin:16px 16px 0;border-radius:18px;overflow:hidden;position:relative}
+.top-slider{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;scroll-behavior:smooth}
+.top-slider::-webkit-scrollbar{display:none}
+.top-slider .service-box{min-width:100%;flex:0 0 100%;scroll-snap-align:center;margin-bottom:0;box-shadow:0 4px 15px rgba(0,0,0,.12)}
+
+/* TOAST */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(40px);background:#1e293b;color:#fff;padding:11px 20px;border-radius:12px;font-size:13px;font-weight:500;z-index:999;transition:.3s;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.3);opacity:0}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;padding:7px 0 11px;display:flex;box-shadow:0 -2px 12px rgba(0,0,0,.1);z-index:90}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:.2s;padding:4px 0}
+.bnav-item i{font-size:19px;color:#94a3b8;transition:.2s}
+.bnav-item span{font-size:10px;color:#94a3b8;font-weight:500;transition:.2s}
+.bnav-item.active i,.bnav-item.active span{color:#2563eb}
+.bnav-admin-only{display:none}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:#94a3b8;border-radius:4px}
+.main{padding-bottom:70px}
+@media(min-width:900px){body{max-width:480px;margin:0 auto;box-shadow:0 0 40px rgba(0,0,0,.15)}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-logo" id="secretLogo" onclick="secretTap()" style="cursor:pointer;user-select:none">
+    <div class="logo-icon"><i class="fas fa-star"></i></div>
+    <h1 id="headerSiteTitle">Service Directory</h1>
+  </div>
+  <div class="header-right">
+    <!-- ADMIN: badge + logout (only visible when logged in) -->
+    <div class="admin-hdr-info" id="hdrAdminInfo">
+      <span class="admin-badge">👑 ADMIN</span>
+      <button class="btn-logout-hdr" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+    <button class="hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+  </div>
+</header>
+
+<!-- LOGIN MODAL -->
+<div class="modal-bg" id="loginModal">
+  <div class="modal-box">
+    <div class="modal-logo">
+      <div class="modal-ico"><i class="fas fa-shield-alt"></i></div>
+      <h2>Admin Login</h2>
+      <p>Enter credentials to access admin panel</p>
+    </div>
+    <div class="login-err" id="loginErr"><i class="fas fa-exclamation-circle"></i> Incorrect username or password!</div>
+    <div class="form-group-s">
+      <label>Username</label>
+      <div class="inp-wrap">
+        <i class="fas fa-user"></i>
+        <input type="text" class="form-control" id="loginUser" placeholder="Enter username" autocomplete="off"/>
+      </div>
+    </div>
+    <div class="form-group-s">
+      <label>Password</label>
+      <div class="inp-wrap">
+        <i class="fas fa-lock"></i>
+        <input type="password" class="form-control" id="loginPass" placeholder="Enter password" id="loginPass"/>
+        <button class="toggle-pass" onclick="togglePassVis()" type="button"><i class="fas fa-eye" id="eyeIcon"></i></button>
+      </div>
+    </div>
+    <button class="btn-login-submit" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> Login as Admin</button>
+    <div class="modal-hint">Default: <b>admin</b> / <b>admin@123</b></div>
+    <div style="text-align:center;margin-top:12px">
+      <button onclick="closeLogin()" style="background:none;border:none;color:#94a3b8;font-size:13px;cursor:pointer">✕ Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- SIDEBAR OVERLAY -->
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h2 id="sidebarSiteTitle">Service Directory</h2>
+    <p id="sidebarRole">Premium Service Platform</p>
+  </div>
+  <button class="sidebar-close" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
+  <nav>
+    <div class="nav-item active" onclick="showPage('home');toggleSidebar()"><i class="fas fa-home"></i> Home</div>
+    <!-- ADMIN ONLY ITEMS -->
+    <div class="nav-section-label admin-only" id="navAdminLabel">Admin Panel</div>
+    <div class="nav-item admin-only" onclick="showPage('admin');toggleSidebar()"><i class="fas fa-tachometer-alt"></i> Dashboard</div>
+    <div class="nav-item admin-only" onclick="showPage('addProfile');toggleSidebar()"><i class="fas fa-user-plus"></i> Add Profile</div>
+    <div class="nav-item admin-only" onclick="showPage('manageProfiles');toggleSidebar()"><i class="fas fa-users-cog"></i> Manage Profiles</div>
+    <div class="nav-divider admin-only"></div>
+    <div class="nav-item admin-only" onclick="showPage('addState');toggleSidebar()"><i class="fas fa-map"></i> Add State</div>
+    <div class="nav-item admin-only" onclick="showPage('addCity');toggleSidebar()"><i class="fas fa-city"></i> Add City</div>
+    <div class="nav-item admin-only" onclick="showPage('manageSlider');toggleSidebar()"><i class="fas fa-layer-group"></i> Service Boxes</div>
+    <div class="nav-item admin-only" onclick="showToast('Coming soon!');toggleSidebar()"><i class="fas fa-cog"></i> Settings</div>
+    <div class="nav-divider"></div>
+    <div class="nav-item nav-logout admin-only" id="navLogout" onclick="doLogout();toggleSidebar()"><i class="fas fa-sign-out-alt"></i> Logout</div>
+  </nav>
+</div>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+  <!-- HOME PAGE -->
+  <div class="page active" id="page-home">
+    <div class="filters">
+      <select class="filter-select" id="stateFilter" onchange="onFilterStateChange()">
+        <option value="">Select State</option>
+      </select>
+      <select class="filter-select" id="cityFilter" onchange="filterProfiles()">
+        <option value="">Select City</option>
+      </select>
+    </div>
+    <div class="hero">
+      <div class="hero-badge">⭐ PREMIUM SERVICE</div>
+      <h2>Premium Service<br/>Available</h2>
+      <p>Select Your City &amp; Connect Instantly</p>
+      <div class="hero-btns">
+        <button class="btn-call" onclick="showToast('Calling...')"><i class="fas fa-phone"></i> Call Now</button>
+        <button class="btn-wa" onclick="showToast('Opening WhatsApp...')"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+      </div>
+    </div>
+    
+    <!-- TOP SLIDER -->
+    <div class="top-slider-wrap" id="topSliderWrap" style="display:none">
+      <div class="top-slider" id="topSlider"></div>
+      <div style="text-align:center;margin-top:8px;display:flex;justify-content:center;gap:5px" id="topSliderDots"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">Featured Profiles</span>
+        <span class="section-count" id="profileCount">12 Profiles</span>
+      </div>
+      <div class="grid" id="profileGrid"></div>
+      <!-- SERVICE INFO BOXES (show after 10 cards) -->
+      <div id="serviceBoxesSection" style="display:none;margin-top:20px;">
+        <div class="sboxes-header"><i class="fas fa-star"></i> Our Services</div>
+        <div id="serviceBoxesList"></div>
+        <div id="loadMoreWrap" style="display:none;margin-top:16px;">
+          <button class="load-more-btn" onclick="loadMore()"><i class="fas fa-sync-alt"></i> Load More Profiles</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIKED PROFILES PAGE -->
+  <div class="page" id="page-liked">
+    <div class="section" style="padding-top:10px">
+      <div class="section-header">
+        <span class="section-title"><i class="fas fa-heart" style="color:#e11d48;margin-right:6px"></i> My Favorities</span>
+        <span class="section-count" id="likedCount">0 Profiles</span>
+      </div>
+      <div class="grid" id="likedGrid"></div>
+      <div id="likedEmptyMsg" class="empty-msg" style="display:none">
+        <i class="fas fa-heart-broken" style="font-size:40px;color:#cbd5e1;margin-bottom:10px;display:block"></i>
+        You haven't liked any profiles yet.
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN DASHBOARD -->
+  <div class="page" id="page-admin">
+    <div class="admin-wrap">
+      <div class="admin-title"><i class="fas fa-tachometer-alt"></i> Admin Dashboard</div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-val" id="totalProfiles">12</div><div class="stat-lbl">Profiles</div></div>
+        <div class="stat-card"><div class="stat-icon"><i class="fas fa-city"></i></div><div class="stat-val">5</div><div class="stat-lbl">Cities</div></div>
+        <div class="stat-card"><div class="stat-icon"><i class="fas fa-map"></i></div><div class="stat-val">5</div><div class="stat-lbl">States</div></div>
+      </div>
+      <div class="menu-title">Quick Actions</div>
+      <div class="menu-grid">
+        <div class="menu-item" onclick="showPage('addProfile')"><div class="menu-icon"><i class="fas fa-user-plus"></i></div><div class="menu-lbl">Add Profile</div></div>
+        <div class="menu-item" onclick="showPage('manageProfiles')"><div class="menu-icon"><i class="fas fa-users-cog"></i></div><div class="menu-lbl">Manage Profiles</div></div>
+        <div class="menu-item" onclick="showPage('addState')"><div class="menu-icon"><i class="fas fa-map"></i></div><div class="menu-lbl">Add State</div></div>
+        <div class="menu-item" onclick="showPage('addCity')"><div class="menu-icon"><i class="fas fa-city"></i></div><div class="menu-lbl">Add City</div></div>
+        <div class="menu-item" onclick="showPage('manageSlider')"><div class="menu-icon"><i class="fas fa-layer-group"></i></div><div class="menu-lbl">Service Boxes</div></div>
+        <div class="menu-item" onclick="showToast('Settings coming soon!')"><div class="menu-icon"><i class="fas fa-cog"></i></div><div class="menu-lbl">Settings</div></div>
+      </div>
+      <div style="margin-top:16px">
+        <button class="btn-save" style="background:linear-gradient(135deg,#e11d48,#be123c)" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Admin Logout</button>
+      </div>
+
+      <!-- SETTINGS: TITLE & CREDENTIALS -->
+      <div style="margin-top:20px">
+        <div class="menu-title">Site & Security Settings</div>
+        
+        <!-- SITE TITLE SETTING -->
+        <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.08);margin-bottom:14px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+            <div style="width:36px;height:36px;background:#eff6ff;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#2563eb;font-size:16px"><i class="fas fa-text-height"></i></div>
+            <div><div style="font-size:14px;font-weight:700;color:#1e293b">Website Title</div><div style="font-size:11px;color:#6b7280">Change the name shown on header</div></div>
+          </div>
+          <div class="form-group-s">
+            <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Site Name</label>
+            <div class="inp-wrap"><i class="fas fa-heading"></i><input type="text" class="form-control" id="newSiteTitle" placeholder="E.g. Services Directory"/></div>
+          </div>
+          <button class="btn-save" onclick="changeSiteTitle()" style="margin-top:2px"><i class="fas fa-save"></i> Save Title</button>
+        </div>
+
+        <!-- CHANGE CREDENTIALS -->
+        <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.08)">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+            <div style="width:36px;height:36px;background:#fff1f2;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#e11d48;font-size:16px"><i class="fas fa-key"></i></div>
+            <div><div style="font-size:14px;font-weight:700;color:#1e293b">Change Login</div><div style="font-size:11px;color:#6b7280">Update admin username &amp; password</div></div>
+          </div>
+          <div class="form-group-s">
+            <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">New Username</label>
+            <div class="inp-wrap"><i class="fas fa-user"></i><input type="text" class="form-control" id="newUser" placeholder="Enter new username"/></div>
+          </div>
+          <div class="form-group-s">
+            <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">New Password</label>
+            <div class="inp-wrap"><i class="fas fa-lock"></i><input type="password" class="form-control" id="newPass" placeholder="Enter new password"/><button class="toggle-pass" type="button" onclick="toggleNewPass()"><i class="fas fa-eye" id="newEyeIcon"></i></button></div>
+          </div>
+          <div class="form-group-s">
+            <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Confirm Password</label>
+            <div class="inp-wrap"><i class="fas fa-lock"></i><input type="password" class="form-control" id="confirmPass" placeholder="Confirm new password"/></div>
+          </div>
+          <div id="credErr" style="background:#fff1f2;color:#e11d48;border-radius:8px;padding:8px 12px;font-size:12px;margin-bottom:10px;display:none"></div>
+          <div id="credOk" style="background:#f0fdf4;color:#16a34a;border-radius:8px;padding:8px 12px;font-size:12px;margin-bottom:10px;display:none"></div>
+          <button class="btn-save" onclick="changeCredentials()" style="margin-top:2px"><i class="fas fa-save"></i> Save Credentials</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD PROFILE -->
+  <div class="page" id="page-addProfile">
+    <div class="form-wrap">
+      <div class="form-title"><i class="fas fa-user-plus"></i> Add Profile</div>
+      <div class="form-card">
+        <form id="addProfileForm" onsubmit="saveProfile(event)">
+          <div class="form-group-s">
+            <label>Upload Photo</label>
+            <div class="upload-area" onclick="document.getElementById('imgInput').click()">
+              <i class="fas fa-cloud-upload-alt"></i><p>Tap to upload photo</p>
+              <input type="file" id="imgInput" accept="image/*" onchange="previewImg(event)"/>
+            </div>
+            <img id="preview" alt="Preview"/>
+          </div>
+          <div class="form-group-s"><label>Full Name</label><input type="text" class="form-control" id="pName" placeholder="Enter name" required/></div>
+          <div class="form-group-s"><label>Age</label><input type="number" class="form-control" id="pAge" placeholder="Enter age" min="18" max="60" required/></div>
+          <div class="form-group-s"><label>Select State</label>
+            <select class="form-control" id="pState" onchange="updateFormCities()" required>
+              <option value="">Select State</option>
+            </select>
+          </div>
+          <div class="form-group-s"><label>Select City</label>
+            <select class="form-control" id="pCity" required>
+              <option value="">Select City</option>
+            </select>
+          </div>
+          <div class="form-group-s"><label>Phone Number</label><input type="tel" class="form-control" id="pPhone" placeholder="+91 XXXXX XXXXX" required/></div>
+          <div class="form-group-s"><label>WhatsApp Number</label><input type="tel" class="form-control" id="pWa" placeholder="+91 XXXXX XXXXX" required/></div>
+          <button type="submit" class="btn-save"><i class="fas fa-save"></i> Save Profile</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MANAGE PROFILES -->
+  <div class="page" id="page-manageProfiles">
+    <div class="manage-wrap">
+      <div class="manage-title"><i class="fas fa-users-cog"></i> Manage Profiles</div>
+      <div class="search-bar"><i class="fas fa-search"></i><input type="text" placeholder="Search profiles..." oninput="searchProfiles(this.value)"/></div>
+      <div id="manageList"></div>
+    </div>
+  </div>
+
+  <!-- MANAGE STATES -->
+  <div class="page" id="page-addState">
+    <div class="manage-wrap">
+      <div class="manage-title"><i class="fas fa-map"></i> Manage States</div>
+      <div class="form-card" style="margin-bottom:14px">
+        <div class="section-sub"><i class="fas fa-plus-circle"></i> Add New State</div>
+        <div class="add-row">
+          <input type="text" id="newStateName" placeholder="Enter state name"/>
+          <button class="btn-add-item" onclick="addState()"><i class="fas fa-plus"></i> Add</button>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="section-sub"><i class="fas fa-list"></i> All States</div>
+        <div id="statesList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MANAGE CITIES -->
+  <div class="page" id="page-addCity">
+    <div class="manage-wrap">
+      <div class="manage-title"><i class="fas fa-city"></i> Manage Cities</div>
+      <div class="form-card" style="margin-bottom:14px">
+        <div class="section-sub"><i class="fas fa-plus-circle"></i> Add New City</div>
+        <div class="form-group-s">
+          <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Select State</label>
+          <select class="form-control" id="cityStateSelect" onchange="renderCitiesList()">
+            <option value="">Select State</option>
+          </select>
+        </div>
+        <div class="add-row" style="margin-top:8px">
+          <input type="text" id="newCityName" placeholder="Enter city name"/>
+          <button class="btn-add-item" onclick="addCity()"><i class="fas fa-plus"></i> Add</button>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="section-sub"><i class="fas fa-list"></i> Cities in Selected State</div>
+        <div id="citiesList"><div class="empty-msg">Select a state to view cities</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MANAGE SERVICE BOXES -->
+  <div class="page" id="page-manageSlider">
+    <div class="manage-wrap">
+      <div class="manage-title"><i class="fas fa-layer-group"></i> Service Info Boxes</div>
+      <div class="form-card" style="margin-bottom:14px">
+        <div class="section-sub"><i class="fas fa-plus-circle"></i> Add New Box</div>
+        <div class="form-group-s"><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Title</label><input type="text" class="form-control" id="boxTitle" placeholder="E.g. 24/7 Available"/></div>
+        <div class="form-group-s"><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Description</label><textarea class="form-control" id="boxDesc" rows="3" placeholder="Write service description..." style="resize:none"></textarea></div>
+        <div class="form-group-s"><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Icon (FontAwesome class)</label><input type="text" class="form-control" id="boxIcon" placeholder="E.g. fas fa-star"/></div>
+        <div class="form-group-s"><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Color Theme</label>
+          <select class="form-control" id="boxGradient">
+            <option value="135deg,#2563eb,#7c3aed">🔵 Blue → Purple</option>
+            <option value="135deg,#16a34a,#059669">🟢 Green → Teal</option>
+            <option value="135deg,#ea580c,#dc2626">🔴 Orange → Red</option>
+            <option value="135deg,#7c3aed,#c026d3">🟣 Purple → Pink</option>
+            <option value="135deg,#0284c7,#0ea5e9">💙 Sky Blue</option>
+            <option value="135deg,#b45309,#d97706">🟠 Amber → Gold</option>
+            <option value="135deg,#0f766e,#16a34a">🌿 Teal → Green</option>
+            <option value="135deg,#be123c,#e11d48">❤️ Red → Rose</option>
+          </select>
+        </div>
+        <button class="btn-save" onclick="addServiceBox()"><i class="fas fa-plus-circle"></i> Add Service Box</button>
+      </div>
+      <div class="form-card">
+        <div class="section-sub"><i class="fas fa-list"></i> All Service Boxes</div>
+        <div id="manageBoxesList"></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <div class="bnav-item active" id="bnav-home" onclick="showPage('home')">
+    <i class="fas fa-home"></i><span>Home</span>
+  </div>
+  <div class="bnav-item" id="bnav-liked" onclick="showPage('liked')">
+    <i class="fas fa-heart"></i><span>Liked</span>
+  </div>
+  <div class="bnav-item bnav-admin-only" id="bnav-profiles" onclick="showPage('manageProfiles')">
+    <i class="fas fa-users-cog"></i><span>Profiles</span>
+  </div>
+  <div class="bnav-item bnav-admin-only" id="bnav-add" onclick="showPage('addProfile')">
+    <i class="fas fa-plus-circle"></i><span>Add</span>
+  </div>
+  <div class="bnav-item bnav-admin-only" id="bnav-admin" onclick="showPage('admin')">
+    <i class="fas fa-tachometer-alt"></i><span>Admin</span>
+  </div>
+</nav>
+
+<!-- Secret admin entry dot (barely visible in footer) -->
+<div id="secretDot" onclick="secretTap()" title="" style="position:fixed;bottom:6px;right:8px;width:8px;height:8px;border-radius:50%;background:rgba(150,150,150,.18);z-index:999;cursor:pointer"></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CREDENTIALS ──────────────────────────────
+const ADMIN_USER = 'admin';
+const ADMIN_PASS = 'admin@123';
+let isAdmin = sessionStorage.getItem('sd_admin') === '1';
+let ADMIN_USER_CUR = localStorage.getItem('sd_admin_user') || 'admin';
+let ADMIN_PASS_CUR = localStorage.getItem('sd_admin_pass') || 'admin@123';
+
+// ── SECRET TAP COUNTER ───────────────────────
+let tapCount = 0, tapTimer;
+function secretTap(){
+  tapCount++;
+  clearTimeout(tapTimer);
+  if(tapCount >= 2){
+    tapCount = 0;
+    openLogin();
+  } else {
+    tapTimer = setTimeout(()=>{ tapCount=0; }, 1500);
+  }
+}
+
+// ── AUTH FUNCTIONS ────────────────────────────
+function openLogin(){
+  document.getElementById('loginModal').classList.add('open');
+  document.getElementById('loginErr').classList.remove('show');
+  document.getElementById('loginUser').value='';
+  document.getElementById('loginPass').value='';
+}
+function closeLogin(){ document.getElementById('loginModal').classList.remove('open'); }
+
+function doLogin(){
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  if(u === ADMIN_USER_CUR && p === ADMIN_PASS_CUR){
+    isAdmin = true;
+    sessionStorage.setItem('sd_admin','1');
+    closeLogin();
+    updateAuthUI();
+    showToast('Welcome Admin! 👑 Dashboard unlocked.');
+    showPage('admin'); setNav('admin');
+  } else {
+    document.getElementById('loginErr').classList.add('show');
+    document.getElementById('loginPass').value='';
+  }
+}
+
+function doLogout(){
+  isAdmin = false;
+  sessionStorage.removeItem('sd_admin');
+  updateAuthUI();
+  showPage('home'); setNav('home');
+  showToast('Logged out successfully!');
+}
+
+function togglePassVis(){
+  const inp = document.getElementById('loginPass');
+  const ico = document.getElementById('eyeIcon');
+  if(inp.type==='password'){inp.type='text';ico.className='fas fa-eye-slash';}
+  else{inp.type='password';ico.className='fas fa-eye';}
+}
+
+// ── ENTER KEY LOGIN ───────────────────────────
+document.addEventListener('keydown', e => {
+  if(e.key==='Enter' && document.getElementById('loginModal').classList.contains('open')) doLogin();
+});
+
+// ── UPDATE UI BASED ON AUTH ───────────────────
+function updateAuthUI(){
+  // Header (only admin badge/logout visible when logged in)
+  document.getElementById('hdrAdminInfo').style.display = isAdmin ? 'flex' : 'none';
+  // Sidebar admin items
+  document.querySelectorAll('.admin-only').forEach(el => el.style.display = isAdmin ? '' : 'none');
+  document.getElementById('sidebarRole').textContent = isAdmin ? '👑 Logged in as Admin' : 'Premium Service Platform';
+  // Bottom nav admin tabs
+  document.querySelectorAll('.bnav-admin-only').forEach(el => el.style.display = isAdmin ? 'flex' : 'none');
+  // Secret dot: hide when admin is logged in
+  document.getElementById('secretDot').style.display = isAdmin ? 'none' : 'block';
+}
+
+// ── CHANGE CREDENTIALS ───────────────────────
+function changeCredentials(){
+  const nu = document.getElementById('newUser').value.trim();
+  const np = document.getElementById('newPass').value;
+  const cp = document.getElementById('confirmPass').value;
+  const errEl = document.getElementById('credErr');
+  const okEl  = document.getElementById('credOk');
+  errEl.style.display='none'; okEl.style.display='none';
+  if(!nu || !np || !cp){ errEl.textContent='❌ All fields are required!'; errEl.style.display='block'; return; }
+  if(nu.length < 4){ errEl.textContent='❌ Username must be at least 4 characters!'; errEl.style.display='block'; return; }
+  if(np.length < 6){ errEl.textContent='❌ Password must be at least 6 characters!'; errEl.style.display='block'; return; }
+  if(np !== cp){ errEl.textContent='❌ Passwords do not match!'; errEl.style.display='block'; return; }
+  ADMIN_USER_CUR = nu; ADMIN_PASS_CUR = np;
+  localStorage.setItem('sd_admin_user', nu);
+  localStorage.setItem('sd_admin_pass', np);
+  document.getElementById('newUser').value='';
+  document.getElementById('newPass').value='';
+  document.getElementById('confirmPass').value='';
+  okEl.textContent='✅ Credentials updated successfully!';
+  okEl.style.display='block';
+  showToast('Credentials updated! 🔐');
+}
+function toggleNewPass(){
+  const inp=document.getElementById('newPass');
+  const ico=document.getElementById('newEyeIcon');
+  if(inp.type==='password'){inp.type='text';ico.className='fas fa-eye-slash';}
+  else{inp.type='password';ico.className='fas fa-eye';}
+}
+
+// ── SITE TITLE SETTING ───────────────────────
+let currentSiteTitle = localStorage.getItem('sd_site_title') || 'Service Directory';
+function applySiteTitle(){
+  document.getElementById('headerSiteTitle').textContent = currentSiteTitle;
+  document.getElementById('sidebarSiteTitle').textContent = currentSiteTitle;
+  document.title = currentSiteTitle;
+}
+function changeSiteTitle(){
+  const t = document.getElementById('newSiteTitle').value.trim();
+  if(!t) { showToast('❌ Title cannot be empty!'); return; }
+  currentSiteTitle = t;
+  localStorage.setItem('sd_site_title', t);
+  applySiteTitle();
+  document.getElementById('newSiteTitle').value = '';
+  showToast('Website title updated! ✅');
+}
+
+// ── GUARD ADMIN PAGES ─────────────────────────
+const adminPages = ['admin','addProfile','manageProfiles','addState','addCity'];
+function showPage(name){
+  if(adminPages.includes(name) && !isAdmin){
+    openLogin();
+    showToast('🔒 Please login as Admin first!');
+    return;
+  }
+  document.querySelectorAll('.bnav-item').forEach(i => i.classList.remove('active'));
+  const bn = document.getElementById('bnav-'+name);
+  if(bn) bn.classList.add('active');
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(name==='manageProfiles') renderManage(profiles);
+  if(name==='liked') renderLikedProfiles();
+  if(name==='addState'){ renderStatesList(); }
+  if(name==='addCity'){ populateAllDropdowns(); renderCitiesList(); }
+  if(name==='manageSlider'){ renderManageBoxes(); }
+  window.scrollTo(0,0);
+}
+
+// ── DATA ──────────────────────────────────────
+const dummyProfiles = [
+  {id:1,name:"Riya",age:24,city:"Jaipur",state:"Rajasthan",phone:"9876543210",wa:"9876543210",img:"https://randomuser.me/api/portraits/women/44.jpg"},
+  {id:2,name:"Priya",age:22,city:"Mumbai",state:"Maharashtra",phone:"9123456780",wa:"9123456780",img:"https://randomuser.me/api/portraits/women/65.jpg"},
+  {id:3,name:"Sneha",age:26,city:"Bangalore",state:"Karnataka",phone:"9988776655",wa:"9988776655",img:"https://randomuser.me/api/portraits/women/32.jpg"},
+  {id:4,name:"Kavya",age:23,city:"New Delhi",state:"Delhi",phone:"9871234560",wa:"9871234560",img:"https://randomuser.me/api/portraits/women/68.jpg"},
+  {id:5,name:"Nisha",age:25,city:"Surat",state:"Gujarat",phone:"9856321470",wa:"9856321470",img:"https://randomuser.me/api/portraits/women/12.jpg"},
+  {id:6,name:"Pooja",age:27,city:"Jaipur",state:"Rajasthan",phone:"9745632180",wa:"9745632180",img:"https://randomuser.me/api/portraits/women/18.jpg"},
+  {id:7,name:"Ananya",age:21,city:"Mumbai",state:"Maharashtra",phone:"9634521870",wa:"9634521870",img:"https://randomuser.me/api/portraits/women/55.jpg"},
+  {id:8,name:"Divya",age:24,city:"Bangalore",state:"Karnataka",phone:"9523410960",wa:"9523410960",img:"https://randomuser.me/api/portraits/women/27.jpg"},
+  {id:9,name:"Meera",age:28,city:"New Delhi",state:"Delhi",phone:"9412309850",wa:"9412309850",img:"https://randomuser.me/api/portraits/women/49.jpg"},
+  {id:10,name:"Sonia",age:22,city:"Surat",state:"Gujarat",phone:"9301298740",wa:"9301298740",img:"https://randomuser.me/api/portraits/women/38.jpg"},
+  {id:11,name:"Tanya",age:25,city:"Jaipur",state:"Rajasthan",phone:"9213456780",wa:"9213456780",img:"https://randomuser.me/api/portraits/women/22.jpg"},
+  {id:12,name:"Renu",age:23,city:"Mumbai",state:"Maharashtra",phone:"9156789430",wa:"9156789430",img:"https://randomuser.me/api/portraits/women/77.jpg"},
+];
+let profiles = JSON.parse(localStorage.getItem('sd_profiles') || 'null') || dummyProfiles;
+let nextId = profiles.length ? Math.max(...profiles.map(p=>p.id))+1 : 1;
+function saveToStorage(){ localStorage.setItem('sd_profiles', JSON.stringify(profiles)); }
+
+// ── STATE & CITY DATA ─────────────────────────
+const defaultStates = ['Rajasthan','Maharashtra','Delhi','Karnataka','Gujarat'];
+const defaultCities = {
+  'Rajasthan':['Jaipur','Jodhpur','Udaipur'],
+  'Maharashtra':['Mumbai','Pune','Nagpur'],
+  'Delhi':['New Delhi','Dwarka','Rohini'],
+  'Karnataka':['Bangalore','Mysore','Hubli'],
+  'Gujarat':['Surat','Ahmedabad','Vadodara']
+};
+let states = JSON.parse(localStorage.getItem('sd_states')||'null') || defaultStates;
+let cities  = JSON.parse(localStorage.getItem('sd_cities')||'null') || defaultCities;
+function saveStates(){ localStorage.setItem('sd_states', JSON.stringify(states)); }
+function saveCities(){ localStorage.setItem('sd_cities', JSON.stringify(cities)); }
+
+function populateAllDropdowns(){
+  // state dropdowns (stateFilter, pState, cityStateSelect)
+  ['stateFilter','pState','cityStateSelect'].forEach(id=>{
+    const el=document.getElementById(id); if(!el) return;
+    const v=el.value;
+    el.innerHTML='<option value="">Select State</option>'+states.map(s=>`<option>${s}</option>`).join('');
+    if(v) el.value=v;
+  });
+  // city filter - all cities flat
+  const cf=document.getElementById('cityFilter');
+  if(cf){
+    const v=cf.value;
+    const all=[...new Set(Object.values(cities).flat())];
+    cf.innerHTML='<option value="">Select City</option>'+all.map(c=>`<option>${c}</option>`).join('');
+    if(v) cf.value=v;
+  }
+  // pCity based on pState selection
+  updateFormCities();
+}
+
+function updateFormCities(){
+  const st=document.getElementById('pState');
+  const ct=document.getElementById('pCity');
+  if(!st||!ct) return;
+  const sel=st.value;
+  const list=sel ? (cities[sel]||[]) : [...new Set(Object.values(cities).flat())];
+  const v=ct.value;
+  ct.innerHTML='<option value="">Select City</option>'+list.map(c=>`<option>${c}</option>`).join('');
+  if(v) ct.value=v;
+}
+
+function onFilterStateChange(){
+  const st=document.getElementById('stateFilter').value;
+  const cf=document.getElementById('cityFilter');
+  const list=st?(cities[st]||[]):[...new Set(Object.values(cities).flat())];
+  cf.innerHTML='<option value="">Select City</option>'+list.map(c=>`<option>${c}</option>`).join('');
+  filterProfiles();
+}
+
+function renderStatesList(){
+  const el=document.getElementById('statesList'); if(!el) return;
+  if(!states.length){el.innerHTML='<div class="empty-msg"><i class="fas fa-map"></i> No states yet</div>';return;}
+  el.innerHTML=states.map(s=>`
+    <div class="list-item">
+      <div class="list-item-label"><i class="fas fa-map-marker-alt"></i>${s} <span style="font-size:11px;color:#94a3b8;font-weight:400">(${(cities[s]||[]).length} cities)</span></div>
+      <button class="btn-del" onclick="deleteState('${s}')"><i class="fas fa-trash-alt"></i></button>
+    </div>`).join('');
+}
+
+function addState(){
+  const el=document.getElementById('newStateName');
+  const name=el.value.trim();
+  if(!name){showToast('State name required!');return;}
+  if(states.map(s=>s.toLowerCase()).includes(name.toLowerCase())){showToast('State already exists!');return;}
+  states.push(name);
+  if(!cities[name]) cities[name]=[];
+  saveStates(); saveCities();
+  el.value='';
+  renderStatesList(); populateAllDropdowns();
+  showToast('State "'+name+'" added! ✅');
+}
+
+function deleteState(name){
+  if(!confirm('Delete "'+name+'" and ALL its cities?')) return;
+  states=states.filter(s=>s!==name);
+  delete cities[name];
+  saveStates(); saveCities();
+  renderStatesList(); populateAllDropdowns();
+  showToast('State deleted!');
+}
+
+function renderCitiesList(){
+  const stEl=document.getElementById('cityStateSelect');
+  const el=document.getElementById('citiesList'); if(!el) return;
+  const state=stEl?stEl.value:'';
+  if(!state){el.innerHTML='<div class="empty-msg">Select a state to view cities</div>';return;}
+  const list=cities[state]||[];
+  if(!list.length){el.innerHTML='<div class="empty-msg">No cities in '+state+' yet</div>';return;}
+  el.innerHTML=list.map(c=>`
+    <div class="list-item">
+      <div class="list-item-label"><i class="fas fa-building"></i>${c}</div>
+      <button class="btn-del" onclick="deleteCity('${state}','${c}')"><i class="fas fa-trash-alt"></i></button>
+    </div>`).join('');
+}
+
+function addCity(){
+  const stEl=document.getElementById('cityStateSelect');
+  const nmEl=document.getElementById('newCityName');
+  const state=stEl.value; const name=nmEl.value.trim();
+  if(!state){showToast('Select a state first!');return;}
+  if(!name){showToast('City name required!');return;}
+  if(!cities[state]) cities[state]=[];
+  if(cities[state].map(c=>c.toLowerCase()).includes(name.toLowerCase())){showToast('City already exists!');return;}
+  cities[state].push(name);
+  saveCities();
+  nmEl.value='';
+  renderCitiesList(); populateAllDropdowns();
+  showToast('City "'+name+'" added! ✅');
+}
+
+function deleteCity(state,city){
+  if(!confirm('Delete "'+city+'"?')) return;
+  cities[state]=cities[state].filter(c=>c!==city);
+  saveCities();
+  renderCitiesList(); populateAllDropdowns();
+  showToast('City deleted!');
+}
+
+// ── LIKES DATA ────────────────────────────────
+let likedIds = JSON.parse(localStorage.getItem('sd_likes')||'[]');
+function saveLikes(){ localStorage.setItem('sd_likes', JSON.stringify(likedIds)); }
+
+function toggleLike(id, event){
+  event.stopPropagation();
+  const btn = event.currentTarget;
+  if(likedIds.includes(id)){
+    likedIds = likedIds.filter(x => x !== id);
+    btn.classList.remove('liked');
+    btn.innerHTML = '<i class="far fa-heart"></i>';
+    showToast('Removed from Liked');
+  } else {
+    likedIds.push(id);
+    btn.classList.add('liked');
+    btn.innerHTML = '<i class="fas fa-heart"></i>';
+    showToast('Added to Liked ❤️');
+  }
+  saveLikes();
+  
+  // Update liked page if active
+  if(document.getElementById('page-liked').classList.contains('active')){
+    renderLikedProfiles();
+  }
+}
+
+// ── PROFILE CARD HTML ────────────────────────
+function cardHTML(p){
+  const isLiked = likedIds.includes(p.id);
+  const heartClass = isLiked ? 'fas fa-heart' : 'far fa-heart';
+  const btnClass = isLiked ? 'card-like-btn liked' : 'card-like-btn';
+  return `<div class="card">
+    <div class="card-img-wrap">
+      <img src="${p.img||'https://via.placeholder.com/200x160?text=Photo'}" alt="${p.name}" loading="lazy"/>
+      <button class="${btnClass}" onclick="toggleLike(${p.id}, event)"><i class="${heartClass}"></i></button>
+    </div>
+    <div class="card-body">
+      <div class="card-name">${p.name} <span class="card-age">• ${p.age}</span></div>
+      <div class="card-city"><i class="fas fa-map-marker-alt"></i>${p.city}</div>
+      <div class="card-actions">
+        <button class="card-btn-call" onclick="callNow('${p.phone}')"><i class="fas fa-phone"></i> Call</button>
+        <button class="card-btn-wa" onclick="waMsg('${p.wa}')"><i class="fab fa-whatsapp"></i> WA</button>
+      </div>
+    </div>
+  </div>`;}
+
+function renderLikedProfiles(){
+  const list = profiles.filter(p => likedIds.includes(p.id));
+  const grid = document.getElementById('likedGrid');
+  const empty = document.getElementById('likedEmptyMsg');
+  document.getElementById('likedCount').textContent = list.length+' Profiles';
+  
+  if(list.length === 0){
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+  } else {
+    empty.style.display = 'none';
+    grid.innerHTML = list.map(cardHTML).join('');
+  }
+}
+
+// ── RENDER PROFILES (paginated) ───────────────
+let currentFilteredList = [];
+let shownCount = 10;
+const PAGE_SIZE = 10;
+
+function renderProfiles(list){
+  currentFilteredList = list;
+  shownCount = PAGE_SIZE;
+  document.getElementById('profileCount').textContent = list.length+' Profiles';
+  document.getElementById('profileGrid').innerHTML = list.slice(0,shownCount).map(cardHTML).join('');
+  // show service boxes + load more after first render
+  const sbSec = document.getElementById('serviceBoxesSection');
+  if(list.length > 0){ sbSec.style.display='block'; renderServiceBoxes(); } else { sbSec.style.display='none'; }
+  document.getElementById('loadMoreWrap').style.display = list.length > shownCount ? 'block' : 'none';
+}
+
+function loadMore(){
+  shownCount += PAGE_SIZE;
+  document.getElementById('profileGrid').innerHTML = currentFilteredList.slice(0,shownCount).map(cardHTML).join('');
+  document.getElementById('loadMoreWrap').style.display = currentFilteredList.length > shownCount ? 'block' : 'none';
+  window.scrollTo({top: document.getElementById('profileGrid').offsetTop - 60, behavior:'smooth'});
+}
+
+function renderManage(list){
+  const el = document.getElementById('manageList');
+  if(!list.length){el.innerHTML='<p style="text-align:center;color:#94a3b8;padding:24px">No profiles found.</p>';return;}
+  el.innerHTML = list.map(p=>`
+    <div class="manage-card">
+      <img class="manage-img" src="${p.img||'https://via.placeholder.com/54?text=P'}" alt="${p.name}" loading="lazy"/>
+      <div class="manage-info">
+        <div class="manage-name">${p.name} • ${p.age}</div>
+        <div class="manage-meta"><i class="fas fa-map-marker-alt" style="color:#2563eb;font-size:10px"></i> ${p.city}, ${p.state}</div>
+        <div class="manage-meta"><i class="fas fa-phone" style="color:#16a34a;font-size:10px"></i> ${p.phone}</div>
+      </div>
+      <div class="manage-actions">
+        <button class="btn-edit" onclick="editProfile(${p.id})"><i class="fas fa-edit"></i></button>
+        <button class="btn-del" onclick="delProfile(${p.id})"><i class="fas fa-trash-alt"></i></button>
+      </div>
+    </div>`).join('');
+}
+
+function filterProfiles(){
+  const s = document.getElementById('stateFilter').value;
+  const c = document.getElementById('cityFilter').value;
+  let list = profiles;
+  if(s) list = list.filter(p=>p.state===s);
+  if(c) list = list.filter(p=>p.city===c);
+  renderProfiles(list);
+}
+
+function searchProfiles(q){
+  q = q.toLowerCase();
+  renderManage(q ? profiles.filter(p=>p.name.toLowerCase().includes(q)||p.city.toLowerCase().includes(q)) : profiles);
+}
+
+function callNow(ph){ window.location.href='tel:+91'+ph; }
+function waMsg(ph){ window.open('https://wa.me/91'+ph,'_blank'); }
+
+function delProfile(id){
+  if(!confirm('Delete this profile?')) return;
+  profiles = profiles.filter(p=>p.id!==id);
+  saveToStorage(); renderManage(profiles); renderProfiles(profiles);
+  document.getElementById('totalProfiles').textContent = profiles.length;
+  showToast('Profile deleted!');
+}
+
+function editProfile(id){
+  const p = profiles.find(x=>x.id===id); if(!p) return;
+  document.getElementById('pName').value=p.name;
+  document.getElementById('pAge').value=p.age;
+  document.getElementById('pState').value=p.state;
+  document.getElementById('pCity').value=p.city;
+  document.getElementById('pPhone').value=p.phone;
+  document.getElementById('pWa').value=p.wa;
+  showPage('addProfile');
+  showToast('Edit mode – update & save!');
+}
+
+function saveProfile(e){
+  e.preventDefault();
+  const prev = document.getElementById('preview');
+  profiles.push({
+    id:nextId++,
+    name:document.getElementById('pName').value,
+    age:+document.getElementById('pAge').value,
+    city:document.getElementById('pCity').value,
+    state:document.getElementById('pState').value,
+    phone:document.getElementById('pPhone').value,
+    wa:document.getElementById('pWa').value,
+    img:prev.style.display!=='none'?prev.src:''
+  });
+  saveToStorage(); renderProfiles(profiles); renderManage(profiles);
+  document.getElementById('totalProfiles').textContent = profiles.length;
+  document.getElementById('addProfileForm').reset();
+  prev.style.display='none';
+  showToast('Profile saved! 🎉'); showPage('home');
+}
+
+function previewImg(e){
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    const imgObj = new Image();
+    imgObj.onload = function(){
+      const canvas = document.createElement('canvas');
+      const targetW = 400; const targetH = 500;
+      canvas.width = targetW; canvas.height = targetH;
+      const ctx = canvas.getContext('2d');
+      const ratio = Math.max(targetW / imgObj.width, targetH / imgObj.height);
+      const newW = imgObj.width * ratio;
+      const newH = imgObj.height * ratio;
+      const offsetX = (targetW - newW) / 2;
+      const offsetY = (targetH - newH) / 2;
+      ctx.fillStyle = "#fff"; ctx.fillRect(0,0,targetW,targetH);
+      ctx.drawImage(imgObj, offsetX, offsetY, newW, newH);
+      const prev = document.getElementById('preview');
+      prev.src = canvas.toDataURL('image/jpeg', 0.85);
+      prev.style.display = 'block';
+    }
+    imgObj.src = ev.target.result;
+  }
+  r.readAsDataURL(f);
+}
+
+function setNav(key){
+  document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('active'));
+  const el=document.getElementById('bnav-'+key); if(el) el.classList.add('active');
+}
+
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open');
+}
+
+let toastTimer;
+function showToast(msg){
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// ── SERVICE BOXES DATA ───────────────────────
+const defaultBoxes = [
+  {id:1,icon:'fas fa-crown',title:'Premium Companion Services',desc:'Experience top-tier companionship with verified & trusted profiles across all major cities.',gradient:'135deg,#2563eb,#7c3aed'},
+  {id:2,icon:'fas fa-shield-alt',title:'100% Privacy Guaranteed',desc:'Your privacy is our top priority. All conversations and bookings are completely confidential.',gradient:'135deg,#16a34a,#059669'},
+  {id:3,icon:'fas fa-clock',title:'Available 24/7',desc:'Our services are available round the clock, 365 days a year. Reach us anytime via Call or WhatsApp.',gradient:'135deg,#ea580c,#dc2626'},
+  {id:4,icon:'fas fa-check-circle',title:'Verified Profiles Only',desc:'All profiles are manually verified by our team to ensure authenticity and quality service.',gradient:'135deg,#7c3aed,#c026d3'},
+];
+let serviceBoxes = JSON.parse(localStorage.getItem('sd_boxes')||'null') || defaultBoxes;
+let nextBoxId = serviceBoxes.length ? Math.max(...serviceBoxes.map(b=>b.id))+1 : 1;
+function saveBoxes(){ localStorage.setItem('sd_boxes',JSON.stringify(serviceBoxes)); }
+
+function renderServiceBoxes(){
+  const listHtml = serviceBoxes.map(b=>`
+    <div class="service-box" style="background:linear-gradient(${b.gradient})">
+      <div class="sbox-icon"><i class="${b.icon||'fas fa-star'}"></i></div>
+      <div class="sbox-title">${b.title}</div>
+      <div class="sbox-desc">${b.desc}</div>
+    </div>`).join('');
+    
+  const el=document.getElementById('serviceBoxesList'); 
+  if(el) el.innerHTML = listHtml;
+  
+  // also update top slider
+  const tsWrap = document.getElementById('topSliderWrap');
+  const ts = document.getElementById('topSlider');
+  const tsDots = document.getElementById('topSliderDots');
+  if(tsWrap && ts && tsDots){
+    if(serviceBoxes.length > 0){
+      tsWrap.style.display = 'block';
+      ts.innerHTML = listHtml;
+      tsDots.innerHTML = serviceBoxes.map((_,i)=>`<div class="dot ${i===0?'active':''}" style="width:6px;height:6px;border-radius:50%;background:#cbd5e1;transition:.2s" id="dot-${i}"></div>`).join('');
+      // reset slider
+      ts.scrollTo(0,0);
+      heroSlideIndex = 0;
+      updateDots();
+    } else {
+      tsWrap.style.display = 'none';
+    }
+  }
+}
+
+// Auto slider logic
+let heroSlideIndex = 0;
+function updateDots(){
+  for(let i=0; i<serviceBoxes.length; i++){
+    let d=document.getElementById('dot-'+i);
+    if(d) d.style.background = i===heroSlideIndex ? '#3b82f6' : '#cbd5e1';
+  }
+}
+setInterval(()=>{
+  const ts = document.getElementById('topSlider');
+  if(!ts || ts.children.length===0 || serviceBoxes.length<=1) return;
+  heroSlideIndex++;
+  if(heroSlideIndex >= serviceBoxes.length) heroSlideIndex = 0;
+  ts.scrollTo({left: heroSlideIndex * ts.offsetWidth, behavior:'smooth'});
+  updateDots();
+}, 3500);
+
+function renderManageBoxes(){
+  const el=document.getElementById('manageBoxesList'); if(!el) return;
+  if(!serviceBoxes.length){el.innerHTML='<div class="empty-msg">No service boxes added yet</div>';return;}
+  el.innerHTML=serviceBoxes.map(b=>`
+    <div class="list-item" style="flex-direction:column;align-items:flex-start;gap:8px">
+      <div style="display:flex;justify-content:space-between;width:100%;align-items:center">
+        <div class="list-item-label"><i class="${b.icon||'fas fa-star'}"></i>${b.title}</div>
+        <button class="btn-del" onclick="deleteBox(${b.id})"><i class="fas fa-trash-alt"></i></button>
+      </div>
+      <div style="font-size:12px;color:#64748b;line-height:1.5">${b.desc}</div>
+      <div style="height:6px;border-radius:4px;width:80px;background:linear-gradient(${b.gradient})"></div>
+    </div>`).join('');
+}
+
+function addServiceBox(){
+  const t=document.getElementById('boxTitle').value.trim();
+  const d=document.getElementById('boxDesc').value.trim();
+  const ic=document.getElementById('boxIcon').value.trim()||'fas fa-star';
+  const g=document.getElementById('boxGradient').value;
+  if(!t||!d){showToast('Title and description required!');return;}
+  serviceBoxes.push({id:nextBoxId++,icon:ic,title:t,desc:d,gradient:g});
+  saveBoxes();
+  document.getElementById('boxTitle').value='';
+  document.getElementById('boxDesc').value='';
+  document.getElementById('boxIcon').value='';
+  renderManageBoxes(); renderServiceBoxes();
+  showToast('Service box added! ✅');
+}
+
+function deleteBox(id){
+  if(!confirm('Delete this service box?')) return;
+  serviceBoxes=serviceBoxes.filter(b=>b.id!==id);
+  saveBoxes(); renderManageBoxes(); renderServiceBoxes();
+  showToast('Box deleted!');
+}
+
+// ── INIT ──────────────────────────────────────
+applySiteTitle();
+renderProfiles(profiles);
+populateAllDropdowns();
+updateAuthUI();
+</script>
+</body>
+</html>
