@@ -286,10 +286,10 @@ body{font-family:'Inter',sans-serif;background:#f0f4ff;min-height:100vh;overflow
   <button class="sidebar-close" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
   <nav>
     <div class="nav-item active" onclick="showPage('home');toggleSidebar()"><i class="fas fa-home"></i> Home</div>
+    <div class="nav-item" onclick="showPage('addProfile');toggleSidebar()"><i class="fas fa-user-plus"></i> Add Profile</div>
     <!-- ADMIN ONLY ITEMS -->
     <div class="nav-section-label admin-only" id="navAdminLabel">Admin Panel</div>
     <div class="nav-item admin-only" onclick="showPage('admin');toggleSidebar()"><i class="fas fa-tachometer-alt"></i> Dashboard</div>
-    <div class="nav-item admin-only" onclick="showPage('addProfile');toggleSidebar()"><i class="fas fa-user-plus"></i> Add Profile</div>
     <div class="nav-item admin-only" onclick="showPage('manageProfiles');toggleSidebar()"><i class="fas fa-users-cog"></i> Manage Profiles</div>
     <div class="nav-divider admin-only"></div>
     <div class="nav-item admin-only" onclick="showPage('addState');toggleSidebar()"><i class="fas fa-map"></i> Add State</div>
@@ -555,7 +555,7 @@ body{font-family:'Inter',sans-serif;background:#f0f4ff;min-height:100vh;overflow
   <div class="bnav-item bnav-admin-only" id="bnav-profiles" onclick="showPage('manageProfiles')">
     <i class="fas fa-users-cog"></i><span>Profiles</span>
   </div>
-  <div class="bnav-item bnav-admin-only" id="bnav-add" onclick="showPage('addProfile')">
+  <div class="bnav-item" id="bnav-add" onclick="showPage('addProfile')">
     <i class="fas fa-plus-circle"></i><span>Add</span>
   </div>
   <div class="bnav-item bnav-admin-only" id="bnav-admin" onclick="showPage('admin')">
@@ -694,7 +694,7 @@ function changeSiteTitle(){
 }
 
 // ── GUARD ADMIN PAGES ─────────────────────────
-const adminPages = ['admin','addProfile','manageProfiles','addState','addCity'];
+const adminPages = ['admin','manageProfiles','addState','addCity'];
 function showPage(name){
   if(adminPages.includes(name) && !isAdmin){
     openLogin();
@@ -730,6 +730,7 @@ const dummyProfiles = [
   {id:12,name:"Renu",age:23,city:"Mumbai",state:"Maharashtra",phone:"9156789430",wa:"9156789430",img:"https://randomuser.me/api/portraits/women/77.jpg"},
 ];
 let profiles = JSON.parse(localStorage.getItem('sd_profiles') || 'null') || dummyProfiles;
+profiles = profiles.map(p => ({...p, approved: p.approved !== false}));
 let nextId = profiles.length ? Math.max(...profiles.map(p=>p.id))+1 : 1;
 function saveToStorage(){ localStorage.setItem('sd_profiles', JSON.stringify(profiles)); }
 
@@ -946,21 +947,33 @@ function renderManage(list){
     <div class="manage-card">
       <img class="manage-img" src="${p.img||'https://via.placeholder.com/54?text=P'}" alt="${p.name}" loading="lazy"/>
       <div class="manage-info">
-        <div class="manage-name">${p.name} • ${p.age}</div>
+        <div class="manage-name">${p.name} • ${p.age} ${p.approved === false ? '<span style="color:#e11d48;font-size:10px;font-weight:bold;margin-left:4px">[Pending]</span>' : ''}</div>
         <div class="manage-meta"><i class="fas fa-map-marker-alt" style="color:#2563eb;font-size:10px"></i> ${p.city}, ${p.state}</div>
         <div class="manage-meta"><i class="fas fa-phone" style="color:#16a34a;font-size:10px"></i> ${p.phone}</div>
       </div>
       <div class="manage-actions">
+        ${p.approved === false ? `<button class="btn-edit" style="background:#dcfce7;color:#16a34a" onclick="approveProfile(${p.id})" title="Approve"><i class="fas fa-check"></i></button>` : ''}
         <button class="btn-edit" onclick="editProfile(${p.id})"><i class="fas fa-edit"></i></button>
         <button class="btn-del" onclick="delProfile(${p.id})"><i class="fas fa-trash-alt"></i></button>
       </div>
     </div>`).join('');
 }
 
+function approveProfile(id){
+  const p = profiles.find(x => x.id === id);
+  if(p) {
+    p.approved = true;
+    saveToStorage();
+    renderManage(profiles);
+    filterProfiles();
+    showToast('Profile Approved! ✅');
+  }
+}
+
 function filterProfiles(){
   const s = document.getElementById('stateFilter').value;
   const c = document.getElementById('cityFilter').value;
-  let list = profiles;
+  let list = profiles.filter(p => p.approved !== false);
   if(s) list = list.filter(p=>p.state===s);
   if(c) list = list.filter(p=>p.city===c);
   renderProfiles(list);
@@ -977,7 +990,7 @@ function waMsg(ph){ window.open('https://wa.me/91'+ph,'_blank'); }
 function delProfile(id){
   if(!confirm('Delete this profile?')) return;
   profiles = profiles.filter(p=>p.id!==id);
-  saveToStorage(); renderManage(profiles); renderProfiles(profiles);
+  saveToStorage(); renderManage(profiles); filterProfiles();
   document.getElementById('totalProfiles').textContent = profiles.length;
   showToast('Profile deleted!');
 }
@@ -997,6 +1010,7 @@ function editProfile(id){
 function saveProfile(e){
   e.preventDefault();
   const prev = document.getElementById('preview');
+  const isAutoApprove = isAdmin;
   profiles.push({
     id:nextId++,
     name:document.getElementById('pName').value,
@@ -1005,13 +1019,21 @@ function saveProfile(e){
     state:document.getElementById('pState').value,
     phone:document.getElementById('pPhone').value,
     wa:document.getElementById('pWa').value,
-    img:prev.style.display!=='none'?prev.src:''
+    img:prev.style.display!=='none'?prev.src:'',
+    approved: isAutoApprove
   });
-  saveToStorage(); renderProfiles(profiles); renderManage(profiles);
+  saveToStorage(); 
+  filterProfiles(); 
+  renderManage(profiles);
   document.getElementById('totalProfiles').textContent = profiles.length;
   document.getElementById('addProfileForm').reset();
   prev.style.display='none';
-  showToast('Profile saved! 🎉'); showPage('home');
+  if(isAutoApprove){
+    showToast('Profile saved! 🎉');
+  } else {
+    showToast('Profile submitted! Waiting for Admin approval. ⏳');
+  }
+  showPage('home');
 }
 
 function previewImg(e){
@@ -1152,7 +1174,7 @@ function deleteBox(id){
 
 // ── INIT ──────────────────────────────────────
 applySiteTitle();
-renderProfiles(profiles);
+filterProfiles();
 populateAllDropdowns();
 updateAuthUI();
 </script>
